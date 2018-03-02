@@ -12,7 +12,7 @@ public class Main {
     public static void main(String[] args) {
 
         try {
-            FileInputStream fstream = new FileInputStream("p000001_ans.brs");
+            FileInputStream fstream = new FileInputStream("p000001.brs");
             BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
             String strLine;
             int number = 0;
