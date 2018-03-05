@@ -5,6 +5,7 @@ package beans;
  */
 public class Edge{
 
+
     private int firstPoint;
     private int secondPoint;
     private double weight;

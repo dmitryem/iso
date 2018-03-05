@@ -1,4 +1,9 @@
 import beans.Point;
+import beans.TreeHolder;
+import lab2.MinimalTree;
+import lab2.VTKWriter;
+
+import java.io.IOException;
 
 public class Main {
 
@@ -14,18 +19,18 @@ public class Main {
             e.printStackTrace();
         }
         System.out.println(componentCount);*/
-        Point o1 = new Point();
-        o1.setX(1);
-        o1.setY(1);
-        o1.setZ(1);
-        Point o2 = new Point();
-        o2.setX(2);
-        o2.setY(2);
-        o2.setZ(2);
-        System.out.println(o1.compareTo(o2));
+        TreeHolder treeHolder = null;
+        MinimalTree minimalTree = new MinimalTree("1023082.brs");
+        try {
+            treeHolder = minimalTree.buildMinimalTree();
+            minimalTree = null;
+            if (treeHolder != null) {
+                VTKWriter vtkWriter = new VTKWriter("simple.vtk");
+                vtkWriter.writeToFile(treeHolder);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
-
-
-
 }
+

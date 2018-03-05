@@ -8,14 +8,14 @@ import java.util.Set;
  */
 public class TreeHolder {
     private List<Edge> edges;
-    private Set<Point> points;
+    private List<Point> points;
 
 
     public List<Edge> getEdges() {
         return edges;
     }
 
-    public Set<Point> getPoints() {
+    public List<Point> getPoints() {
         return points;
     }
 
@@ -23,7 +23,7 @@ public class TreeHolder {
         this.edges = edges;
     }
 
-    public void setPoints(Set<Point> points) {
+    public void setPoints(List<Point> points) {
         this.points = points;
     }
 }

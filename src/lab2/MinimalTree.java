@@ -21,7 +21,7 @@ public class MinimalTree {
 
     public MinimalTree(String fileName) {
         this.fileName = fileName;
-        points = new LinkedList<>();
+        points = new ArrayList<>();
         edges = new LinkedList<>();
     }
 
@@ -40,8 +40,8 @@ public class MinimalTree {
             }
             Point p1 = points.get(next.getFirstPoint());
             Point p2 = points.get(next.getSecondPoint());
-            if(p1.getSet() != p2.getSet()){
-                union(p1,p2);
+            if (p1.getSet() != p2.getSet()) {
+                union(p1, p2);
                 A.add(next);
             }
             previous = next;
@@ -49,11 +49,14 @@ public class MinimalTree {
         TreeHolder treeHolder = new TreeHolder();
         treeHolder.setEdges(A);
         if (previous != null) {
-            treeHolder.setPoints(points.get(previous.getFirstPoint()).getSet());
+            treeHolder.setPoints(points);
         }
         return treeHolder;
     }
-
+    /*
+     * 72067
+     * 69326
+     */
 
     private void readFromFile() throws IOException {
         boolean canStartPoints = false;
@@ -61,6 +64,7 @@ public class MinimalTree {
         FileInputStream fstream = new FileInputStream(fileName);
         BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
         String strLine;
+        int number = 0;
         while ((strLine = br.readLine()) != null) {
             if (strLine.contains("vertices")) {
                 canStartPoints = true;
@@ -76,12 +80,9 @@ public class MinimalTree {
                 numbers[0] = Integer.parseInt(sNumbers[0]);
                 numbers[1] = Integer.parseInt(sNumbers[1]);
                 numbers[2] = Integer.parseInt(sNumbers[2]);
-                Edge e = createEdge(numbers[0], numbers[1]);
-                edges.add(e);
-                e = createEdge(numbers[1], numbers[2]);
-                edges.add(e);
-                e = createEdge(numbers[0], numbers[2]);
-                edges.add(e);
+                edges.add(createEdge(numbers[0], numbers[1]));
+                edges.add(createEdge(numbers[1], numbers[2]));
+                edges.add(createEdge(numbers[0], numbers[2]));
             }
             if (canStartPoints && !strLine.equals("")) {
                 String[] sNumbers = strLine.split(" ");
@@ -93,6 +94,8 @@ public class MinimalTree {
                 p.setX(numbers[0]);
                 p.setY(numbers[1]);
                 p.setZ(numbers[2]);
+                p.setNumber(number);
+                number++;
                 points.add(p);
             } else if (canStartPoints && strLine.equals("")) {
                 canStartPoints = false;
@@ -116,9 +119,8 @@ public class MinimalTree {
         Point p1 = points.get(i1);
         Point p2 = points.get(i2);
         int c = p1.compareTo(p2);
-
         e.setWeight(distance(p1, p2));
-        if (c == -1) {
+        if (c < 0) {
             e.setFirstPoint(i1);
             e.setSecondPoint(i2);
         } else {
@@ -128,13 +130,16 @@ public class MinimalTree {
         return e;
     }
 
-
     private void union(Point p1, Point p2) {
         Set<Point> additionalSet = p2.getSet();
-        for (Point p : additionalSet) {
-            p1.addToSet(p);
+        Set<Point> mainSet = p1.getSet();
+        if(mainSet.size() < additionalSet.size()){
+            mainSet = p2.getSet();
+            additionalSet = p1.getSet();
         }
-        p2.setSet(p1.getSet());
+        mainSet.addAll(additionalSet);
+        for (Point p : additionalSet) {
+            p.setSet(mainSet);
+        }
     }
-
 }
