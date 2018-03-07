@@ -9,16 +9,6 @@ public class Main {
 
 
     public static void main(String[] args) {
-       /* //ComponentsFinder finder = new ComponentsFinder("1023082.brs");
-        ComponentsFinder finder = new ComponentsFinder("p000001.brs");
-       // ComponentsFinder finder = new ComponentsFinder("1023082.brs");
-        int componentCount = 0;
-        try {
-            componentCount = finder.getStrongComponentCount();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println(componentCount);*/
         TreeHolder treeHolder = null;
         MinimalTree minimalTree = new MinimalTree("1023082.brs");
         try {
