@@ -1,7 +1,6 @@
 package beans;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by demelyanov on 02.03.2018.
@@ -9,6 +8,7 @@ import java.util.Set;
 public class TreeHolder {
     private List<Edge> edges;
     private List<Point> points;
+    private List<List<Integer>> neighbors;
 
 
     public List<Edge> getEdges() {
@@ -25,5 +25,13 @@ public class TreeHolder {
 
     public void setPoints(List<Point> points) {
         this.points = points;
+    }
+
+    public List<List<Integer>> getNeighbors() {
+        return neighbors;
+    }
+
+    public void setNeighbors(List<List<Integer>> neighbors) {
+        this.neighbors = neighbors;
     }
 }

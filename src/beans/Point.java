@@ -11,7 +11,6 @@ public class Point implements Comparable<Point> {
     private double y;
     private double z;
     private Set<Point> set;
-    private int number = -1;
 
     public Point(){
         set = new HashSet<>();
@@ -74,11 +73,4 @@ public class Point implements Comparable<Point> {
         set.add(p);
     }
 
-    public int getNumber() {
-        return number;
-    }
-
-    public void setNumber(int number) {
-        this.number = number;
-    }
 }
