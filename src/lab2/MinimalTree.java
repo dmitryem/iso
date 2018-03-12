@@ -215,7 +215,7 @@ public class MinimalTree {
         }
     }
 
-    public void writeToFile(String mainFile) throws IOException {
+    public void writeToFile(String mainFile,String pointsFile) throws IOException {
 
         length = new Integer[newPoints.size()];
         BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(mainFile)));
@@ -244,7 +244,7 @@ public class MinimalTree {
         }
         wr.flush();
         wr.close();
-        BufferedWriter wrLeafs = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("points.vtk")));
+        BufferedWriter wrLeafs = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pointsFile)));
         wrLeafs.write("# vtk DataFile Version 1.0\n" +
                 "...\n" +
                 "ASCII\n\nDATASET POLYDATA\n");
