@@ -20,6 +20,7 @@ public class VTKWriter {
     private TreeHolder holder;
     private Integer[] length;
 
+
     public VTKWriter(String fileName) {
         this.filename = fileName;
     }
@@ -31,7 +32,7 @@ public class VTKWriter {
         length = new Integer[points.size()];
         BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename)));
         wr.write("# vtk DataFile Version 1.0\n" +
-                "Stroked lines spell hello...\n" +
+                "...\n" +
                 "ASCII\n\nDATASET POLYDATA\n");
 
         wr.write("POINTS " + points.size() + " float\n");
@@ -44,18 +45,23 @@ public class VTKWriter {
         for (Edge e : edges) {
             wr.write("2 " + e.getFirstPoint() + " " + e.getSecondPoint() + "\n");
         }
-        BFS(2);
-        wr.write("FIELD FieldData 1\n" +
-                "length 1 "+ length.length  +" int\n");
+        BFS(25015);
+        wr.write("POINT_DATA " + length.length +
+                "\nSCALARS temp int\n" +
+                "LOOKUP_TABLE default\n");
         for (int i = 0; i < length.length; i++) {
             if (length[i] == null) {
                 wr.write("-1 ");
             } else {
-                wr.write(length[i].toString() + " ");
+                wr.write(length[i].toString() + "\n");
             }
         }
         wr.flush();
         wr.close();
+
+    }
+
+    public void writeToFile(TreeHolder pHolder,int numberOfSets) throws IOException{
 
     }
 
