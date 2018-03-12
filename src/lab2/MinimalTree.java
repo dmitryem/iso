@@ -18,13 +18,12 @@ public class MinimalTree {
     private String fileName;
     private List<Point> points;
     private List<Edge> edges;
-    private List<List<Integer>> neighbors;
+    private Set<Point> maxComponent = null;
 
     public MinimalTree(String fileName) {
         this.fileName = fileName;
         points = new ArrayList<>();
         edges = new LinkedList<>();
-        neighbors = new ArrayList<>();
     }
 
 
@@ -48,13 +47,7 @@ public class MinimalTree {
             }
             previous = next;
         }
-        TreeHolder treeHolder = new TreeHolder();
-        treeHolder.setEdges(A);
-        if (previous != null) {
-            treeHolder.setPoints(points);
-        }
-        treeHolder.setNeighbors(neighbors);
-        return treeHolder;
+        return saveMaxComponentToHolder(A);
     }
     /*
      * 72067
@@ -97,7 +90,6 @@ public class MinimalTree {
                 p.setY(numbers[1]);
                 p.setZ(numbers[2]);
                 points.add(p);
-                neighbors.add(new ArrayList<>());
             } else if (canStartPoints && strLine.equals("")) {
                 canStartPoints = false;
             } else if (canStartEdges && strLine.equals("")) {
@@ -119,8 +111,7 @@ public class MinimalTree {
         Edge e = new Edge();
         Point p1 = points.get(i1);
         Point p2 = points.get(i2);
-        neighbors.get(i1).add(i2);
-        neighbors.get(i2).add(i1);
+
         int c = p1.compareTo(p2);
         e.setWeight(distance(p1, p2));
         if (c < 0) {
@@ -133,11 +124,10 @@ public class MinimalTree {
         return e;
     }
 
-
     private void union(Point p1, Point p2) {
         Set<Point> additionalSet = p2.getSet();
         Set<Point> mainSet = p1.getSet();
-        if(mainSet.size() < additionalSet.size()){
+        if (mainSet.size() < additionalSet.size()) {
             mainSet = p2.getSet();
             additionalSet = p1.getSet();
         }
@@ -145,5 +135,50 @@ public class MinimalTree {
         for (Point p : additionalSet) {
             p.setSet(mainSet);
         }
+        if (maxComponent != null) {
+            if(mainSet.size() > maxComponent.size() && maxComponent != mainSet){
+                maxComponent = mainSet;
+            }
+        } else {
+            maxComponent = mainSet;
+        }
+    }
+
+    private TreeHolder saveMaxComponentToHolder(List<Edge> forest){
+        TreeHolder treeHolder = new TreeHolder();
+        List<Integer> newNumbers =  Arrays.asList(new Integer[points.size()]);
+        List<Edge> edges = new ArrayList<>();
+        List<Point> newPoints = new ArrayList<>();
+        for(Edge e : forest){
+            Point firstPoint = points.get(e.getFirstPoint());
+            if(maxComponent.contains(firstPoint)){
+                int first = e.getFirstPoint();
+                int second = e.getSecondPoint();
+                Point secondPoint = points.get(second);
+
+                if(newNumbers.get(first) == null){
+                    newPoints.add(firstPoint);
+                    int newFirst = newPoints.size()-1;
+                    newNumbers.set(first,newFirst);
+                    e.setFirstPoint(newFirst);
+                }else {
+                    e.setFirstPoint(newNumbers.get(first));
+                }
+
+                if(newNumbers.get(second) == null){
+                    newPoints.add(secondPoint);
+                    int newSecond = newPoints.size()-1;
+                    newNumbers.set(second,newSecond);
+                    e.setSecondPoint(newSecond);
+                }else {
+                    e.setSecondPoint(newNumbers.get(second));
+                }
+
+                edges.add(e);
+            }
+        }
+        treeHolder.setEdges(edges);
+        treeHolder.setPoints(newPoints);
+        return treeHolder;
     }
 }

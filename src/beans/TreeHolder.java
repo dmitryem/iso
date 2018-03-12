@@ -8,7 +8,6 @@ import java.util.List;
 public class TreeHolder {
     private List<Edge> edges;
     private List<Point> points;
-    private List<List<Integer>> neighbors;
 
 
     public List<Edge> getEdges() {
@@ -27,11 +26,4 @@ public class TreeHolder {
         this.points = points;
     }
 
-    public List<List<Integer>> getNeighbors() {
-        return neighbors;
-    }
-
-    public void setNeighbors(List<List<Integer>> neighbors) {
-        this.neighbors = neighbors;
-    }
 }
