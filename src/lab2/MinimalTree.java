@@ -18,9 +18,6 @@ public class MinimalTree {
     private Set<Point> maxComponent = null;
     private Integer[] length;
     private Set<Point> leafs = new HashSet<>();
-    private List<Integer> oldNumbers;
-    private List<Edge> newEdges = new ArrayList<>();
-    private List<Point> newPoints = new ArrayList<>();
 
 
     public MinimalTree(String fileName) {
@@ -50,7 +47,8 @@ public class MinimalTree {
             }
             previous = next;
         }
-        saveMaxComponentToHolder(A);
+        edges = A;
+        saveMaxComponent();
     }
     /*
      * 72067
@@ -122,10 +120,12 @@ public class MinimalTree {
                 numbers[0] = Integer.parseInt(sNumbers[0]);
                 numbers[1] = Integer.parseInt(sNumbers[1]);
                 numbers[2] = Integer.parseInt(sNumbers[2]);
-                for(int i = 0;i<3;i++) {
+                for (int i = 0; i < 3; i++) {
+
                     if (leafs.contains(points.get(numbers[i]))) {
-                        buffer.append("3 ").append(strLine).append("\n");
+                        buffer.append("\n3 ").append(strLine);
                         nTriangles++;
+                        break;
                     }
                 }
             }
@@ -181,66 +181,51 @@ public class MinimalTree {
         }
     }
 
-    private void saveMaxComponentToHolder(List<Edge> forest) {
-        List<Integer> newNumbers = Arrays.asList(new Integer[points.size()]);
-        List<Integer> oldNumbers = Arrays.asList(new Integer[maxComponent.size()]);
-        for (Edge e : forest) {
+
+    private void saveMaxComponent() {
+        Iterator<Edge> iterator = edges.iterator();
+        while (iterator.hasNext()) {
+            Edge e = iterator.next();
             Point firstPoint = points.get(e.getFirstPoint());
-            if (maxComponent.contains(firstPoint)) {
-                int first = e.getFirstPoint();
-                int second = e.getSecondPoint();
-                Point secondPoint = points.get(second);
-
-                if (newNumbers.get(first) == null) {
-                    newPoints.add(firstPoint);
-                    int newFirst = newPoints.size() - 1;
-                    newNumbers.set(first, newFirst);
-                    oldNumbers.set(newFirst, first);
-                    e.setFirstPoint(newFirst);
-                } else {
-                    e.setFirstPoint(newNumbers.get(first));
-                }
-
-                if (newNumbers.get(second) == null) {
-                    newPoints.add(secondPoint);
-                    int newSecond = newPoints.size() - 1;
-                    newNumbers.set(second, newSecond);
-                    oldNumbers.set(newSecond, second);
-                    e.setSecondPoint(newSecond);
-                } else {
-                    e.setSecondPoint(newNumbers.get(second));
-                }
-                newEdges.add(e);
+            if (!maxComponent.contains(firstPoint)) {
+                iterator.remove();
             }
         }
     }
-
-    public void writeToFile(String mainFile,String pointsFile) throws IOException {
-
-        length = new Integer[newPoints.size()];
+    private int start = -1;
+    public void writeToFile(String mainFile, String pointsFile) throws IOException {
         BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(mainFile)));
         wr.write("# vtk DataFile Version 1.0\n" +
                 "...\n" +
                 "ASCII\n\nDATASET POLYDATA\n");
 
-        wr.write("POINTS " + newPoints.size() + " float\n");
+        wr.write("POINTS " + points.size() + " float\n");
 
-        for (Point p : newPoints) {
+        int index = 0;
+        for (Point p : points) {
+            if (start == -1 && maxComponent.contains(p)) {
+                start = index;
+            }
+            index++;
             wr.write(p.getX() + " " + p.getY() + " " + p.getZ() + "\n");
         }
         wr.newLine();
-        wr.write("LINES " + newEdges.size() + " " + newEdges.size() * 3 + "\n");
-        for (Edge e : newEdges) {
+        wr.write("LINES " + edges.size() + " " + edges.size() * 3 + "\n");
+        for (Edge e : edges) {
             wr.write("2 " + e.getFirstPoint() + " " + e.getSecondPoint() + "\n");
         }
 
-        BFS(newPoints.size() / 5);
+        BFS(start);
 
         wr.write("POINT_DATA " + length.length +
                 "\nSCALARS temp int\n" +
                 "LOOKUP_TABLE default\n");
         for (Integer aLength : length) {
-            wr.write(aLength.toString() + "\n");
+            if (aLength == null) {
+                wr.write("-1\n");
+            } else {
+                wr.write(aLength.toString() + "\n");
+            }
         }
         wr.flush();
         wr.close();
@@ -255,8 +240,8 @@ public class MinimalTree {
             wrLeafs.write(p.getX() + " " + p.getY() + " " + p.getZ() + "\n");
         }
         wrLeafs.newLine();
-        String  s = readFromFileForLeafs().toString();
-        wrLeafs.write("LINES " + nTriangles + " " + nTriangles * 3 + "\n");
+        String s = readFromFileForLeafs().toString();
+        wrLeafs.write("TRIANGLE_STRIPS " + nTriangles + " " + nTriangles * 3);
         wrLeafs.write(s);
         wrLeafs.flush();
         wrLeafs.close();
@@ -266,9 +251,8 @@ public class MinimalTree {
 
 
     private List<List<Integer>> buildNeighbors() {
-        List<List<Integer>> neighbors = Arrays.asList(new ArrayList[newPoints.size()]);
-
-        for (Edge e : newEdges) {
+        List<List<Integer>> neighbors = Arrays.asList(new ArrayList[points.size()]);
+        for (Edge e : edges) {
             int first = e.getFirstPoint();
             int second = e.getSecondPoint();
             if (neighbors.get(first) == null) {
@@ -280,14 +264,14 @@ public class MinimalTree {
             neighbors.get(first).add(second);
             neighbors.get(second).add(first);
         }
-
         return neighbors;
     }
 
 
     private void BFS(int start_node) {
         List<List<Integer>> neighbors = buildNeighbors();
-        boolean[] visited = new boolean[neighbors.size()];
+        length = new Integer[points.size()];
+        boolean[] visited = new boolean[points.size()];
         Queue<PointFather> queue = new LinkedList<>();
         queue.add(new PointFather(start_node, start_node));
         visited[start_node] = true;
@@ -297,15 +281,17 @@ public class MinimalTree {
             visited[node.getNode()] = true;
             length[node.getNode()] = length[node.getFather()] + 1;
             List<Integer> localNeighbors = neighbors.get(node.getNode());
-            if (localNeighbors.size() == 1 && visited[localNeighbors.get(0)]) {
-                leafs.add(newPoints.get(node.getNode()));
-                continue;
-            }
+            boolean leaf = true;
             for (int l : localNeighbors) {
                 if (!visited[l]) {
                     queue.add(new PointFather(l, node.getNode()));
                     visited[l] = true;
+                    leaf = false;
                 }
+            }
+            if (leaf) {
+                leafs.add(points.get(node.getNode()));
+
             }
         }
     }
