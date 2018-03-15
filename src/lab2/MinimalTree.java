@@ -11,21 +11,20 @@ import java.util.*;
  * Created by demelyanov on 02.03.2018.
  */
 public class MinimalTree {
-
     private String fileName;
     private List<Point> points;
     private List<Edge> edges;
     private Set<Point> maxComponent = null;
     private Integer[] length;
     private Set<Point> leafs = new HashSet<>();
-
+    private int start = -1;
+    private int nTriangles = 0;
 
     public MinimalTree(String fileName) {
         this.fileName = fileName;
         points = new ArrayList<>();
         edges = new LinkedList<>();
     }
-
 
     public void buildMinimalTree() throws IOException {
         List<Edge> A = new ArrayList<>();
@@ -50,10 +49,6 @@ public class MinimalTree {
         edges = A;
         saveMaxComponent();
     }
-    /*
-     * 72067
-     * 69326
-     */
 
     private void readFromFile() throws IOException {
         boolean canStartPoints = false;
@@ -71,70 +66,44 @@ public class MinimalTree {
                 continue;
             }
             if (canStartEdges && !strLine.equals("")) {
-                String[] sNumbers = strLine.split(" ");
-                int[] numbers = {0, 0, 0};
-                numbers[0] = Integer.parseInt(sNumbers[0]);
-                numbers[1] = Integer.parseInt(sNumbers[1]);
-                numbers[2] = Integer.parseInt(sNumbers[2]);
-                edges.add(createEdge(numbers[0], numbers[1]));
-                edges.add(createEdge(numbers[1], numbers[2]));
-                edges.add(createEdge(numbers[0], numbers[2]));
+                addEdges(strLine);
             }
             if (canStartPoints && !strLine.equals("")) {
-                String[] sNumbers = strLine.split(" ");
-                double[] numbers = {0, 0, 0};
-                numbers[0] = Double.parseDouble(sNumbers[0]);
-                numbers[1] = Double.parseDouble(sNumbers[1]);
-                numbers[2] = Double.parseDouble(sNumbers[2]);
-                Point p = new Point();
-                p.setX(numbers[0]);
-                p.setY(numbers[1]);
-                p.setZ(numbers[2]);
-                points.add(p);
+                addPoint(strLine);
             } else if (canStartPoints && strLine.equals("")) {
                 canStartPoints = false;
+
             } else if (canStartEdges && strLine.equals("")) {
                 canStartEdges = false;
+
             }
         }
         br.close();
 
     }
 
-    private int nTriangles = 0;
+    private void addEdges(String strLine){
+        String[] sNumbers = strLine.split(" ");
+        int[] numbers = {0, 0, 0};
+        numbers[0] = Integer.parseInt(sNumbers[0]);
+        numbers[1] = Integer.parseInt(sNumbers[1]);
+        numbers[2] = Integer.parseInt(sNumbers[2]);
+        edges.add(createEdge(numbers[0], numbers[1]));
+        edges.add(createEdge(numbers[1], numbers[2]));
+        edges.add(createEdge(numbers[0], numbers[2]));
+    }
 
-    private StringBuffer readFromFileForLeafs() throws IOException {
-        boolean canStartEdges = false;
-        FileInputStream fstream = new FileInputStream(fileName);
-        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-        String strLine;
-        StringBuffer buffer = new StringBuffer();
-        while ((strLine = br.readLine()) != null) {
-            if (strLine.contains("triangles")) {
-                canStartEdges = true;
-                continue;
-            }
-            if (canStartEdges && !strLine.equals("")) {
-                String[] sNumbers = strLine.split(" ");
-                int[] numbers = {0, 0, 0};
-                numbers[0] = Integer.parseInt(sNumbers[0]);
-                numbers[1] = Integer.parseInt(sNumbers[1]);
-                numbers[2] = Integer.parseInt(sNumbers[2]);
-                for (int i = 0; i < 3; i++) {
-
-                    if (leafs.contains(points.get(numbers[i]))) {
-                        buffer.append("\n3 ").append(strLine);
-                        nTriangles++;
-                        break;
-                    }
-                }
-            }
-            if (canStartEdges && strLine.equals("")) {
-                canStartEdges = false;
-            }
-        }
-        br.close();
-        return buffer;
+    private void addPoint(String strLine){
+        String[] sNumbers = strLine.split(" ");
+        double[] numbers = {0, 0, 0};
+        numbers[0] = Double.parseDouble(sNumbers[0]);
+        numbers[1] = Double.parseDouble(sNumbers[1]);
+        numbers[2] = Double.parseDouble(sNumbers[2]);
+        Point p = new Point();
+        p.setX(numbers[0]);
+        p.setY(numbers[1]);
+        p.setZ(numbers[2]);
+        points.add(p);
     }
 
     private double distance(Point p1, Point p2) {
@@ -158,6 +127,7 @@ public class MinimalTree {
             e.setFirstPoint(i2);
             e.setSecondPoint(i1);
         }
+
         return e;
     }
 
@@ -181,7 +151,6 @@ public class MinimalTree {
         }
     }
 
-
     private void saveMaxComponent() {
         Iterator<Edge> iterator = edges.iterator();
         while (iterator.hasNext()) {
@@ -192,15 +161,16 @@ public class MinimalTree {
             }
         }
     }
-    private int start = -1;
-    public void writeToFile(String mainFile, String pointsFile) throws IOException {
+
+    public void writeToFile(String mainFile, String leafsFile) throws IOException {
+        writeMainFile(mainFile);
+        writeLeafsFile(leafsFile);
+    }
+
+    private void writeMainFile(String mainFile) throws IOException {
         BufferedWriter wr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(mainFile)));
-        wr.write("# vtk DataFile Version 1.0\n" +
-                "...\n" +
-                "ASCII\n\nDATASET POLYDATA\n");
-
+        wr.write("# vtk DataFile Version 1.0\n...\nASCII\n\nDATASET POLYDATA\n");
         wr.write("POINTS " + points.size() + " float\n");
-
         int index = 0;
         for (Point p : points) {
             if (start == -1 && maxComponent.contains(p)) {
@@ -209,14 +179,11 @@ public class MinimalTree {
             index++;
             wr.write(p.getX() + " " + p.getY() + " " + p.getZ() + "\n");
         }
-        wr.newLine();
-        wr.write("LINES " + edges.size() + " " + edges.size() * 3 + "\n");
+        wr.write("\nLINES " + edges.size() + " " + edges.size() * 3 + "\n");
         for (Edge e : edges) {
             wr.write("2 " + e.getFirstPoint() + " " + e.getSecondPoint() + "\n");
         }
-
         BFS(start);
-
         wr.write("POINT_DATA " + length.length +
                 "\nSCALARS temp int\n" +
                 "LOOKUP_TABLE default\n");
@@ -229,44 +196,54 @@ public class MinimalTree {
         }
         wr.flush();
         wr.close();
-        BufferedWriter wrLeafs = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(pointsFile)));
-        wrLeafs.write("# vtk DataFile Version 1.0\n" +
-                "...\n" +
-                "ASCII\n\nDATASET POLYDATA\n");
+    }
 
+    private void writeLeafsFile(String leafsFile) throws IOException{
+        BufferedWriter wrLeafs = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(leafsFile)));
+        wrLeafs.write("# vtk DataFile Version 1.0\n...\nASCII\n\nDATASET POLYDATA\n");
         wrLeafs.write("POINTS " + points.size() + " float\n");
-
         for (Point p : points) {
             wrLeafs.write(p.getX() + " " + p.getY() + " " + p.getZ() + "\n");
         }
-        wrLeafs.newLine();
         String s = readFromFileForLeafs().toString();
-        wrLeafs.write("TRIANGLE_STRIPS " + nTriangles + " " + nTriangles * 3);
+        wrLeafs.write("\nTRIANGLE_STRIPS " + nTriangles + " " + nTriangles * 3);
         wrLeafs.write(s);
         wrLeafs.flush();
         wrLeafs.close();
-
-
     }
 
-
-    private List<List<Integer>> buildNeighbors() {
-        List<List<Integer>> neighbors = Arrays.asList(new ArrayList[points.size()]);
-        for (Edge e : edges) {
-            int first = e.getFirstPoint();
-            int second = e.getSecondPoint();
-            if (neighbors.get(first) == null) {
-                neighbors.set(first, new ArrayList<>());
+    private StringBuffer readFromFileForLeafs() throws IOException {
+        boolean canStartEdges = false;
+        FileInputStream fstream = new FileInputStream(fileName);
+        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+        String strLine;
+        StringBuffer buffer = new StringBuffer();
+        while ((strLine = br.readLine()) != null) {
+            if (strLine.contains("triangles")) {
+                canStartEdges = true;
+                continue;
             }
-            if (neighbors.get(second) == null) {
-                neighbors.set(second, new ArrayList<>());
+            if (canStartEdges && !strLine.equals("")) {
+                String[] sNumbers = strLine.split(" ");
+                int[] numbers = {0, 0, 0};
+                numbers[0] = Integer.parseInt(sNumbers[0]);
+                numbers[1] = Integer.parseInt(sNumbers[1]);
+                numbers[2] = Integer.parseInt(sNumbers[2]);
+                for (int i = 0; i < 3; i++) {
+                    if (leafs.contains(points.get(numbers[i]))) {
+                        buffer.append("\n3 ").append(strLine);
+                        nTriangles++;
+                        break;
+                    }
+                }
             }
-            neighbors.get(first).add(second);
-            neighbors.get(second).add(first);
+            if (canStartEdges && strLine.equals("")) {
+                canStartEdges = false;
+            }
         }
-        return neighbors;
+        br.close();
+        return buffer;
     }
-
 
     private void BFS(int start_node) {
         List<List<Integer>> neighbors = buildNeighbors();
@@ -291,9 +268,25 @@ public class MinimalTree {
             }
             if (leaf) {
                 leafs.add(points.get(node.getNode()));
-
             }
         }
+    }
+
+    private List<List<Integer>> buildNeighbors() {
+        List<List<Integer>> neighbors = Arrays.asList(new ArrayList[points.size()]);
+        for (Edge e : edges) {
+            int first = e.getFirstPoint();
+            int second = e.getSecondPoint();
+            if (neighbors.get(first) == null) {
+                neighbors.set(first, new ArrayList<>());
+            }
+            if (neighbors.get(second) == null) {
+                neighbors.set(second, new ArrayList<>());
+            }
+            neighbors.get(first).add(second);
+            neighbors.get(second).add(first);
+        }
+        return neighbors;
     }
 
 
