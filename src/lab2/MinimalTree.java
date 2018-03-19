@@ -206,7 +206,7 @@ public class MinimalTree {
             wrLeafs.write(p.getX() + " " + p.getY() + " " + p.getZ() + "\n");
         }
         String s = readFromFileForLeafs().toString();
-        wrLeafs.write("\nTRIANGLE_STRIPS " + nTriangles + " " + nTriangles * 3);
+        wrLeafs.write("\nTRIANGLE_STRIPS " + nTriangles + " " + nTriangles * 4);
         wrLeafs.write(s);
         wrLeafs.flush();
         wrLeafs.close();
