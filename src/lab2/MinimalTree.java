@@ -160,6 +160,7 @@ public class MinimalTree {
                 iterator.remove();
             }
         }
+
     }
 
     public void writeToFile(String mainFile, String leafsFile) throws IOException {

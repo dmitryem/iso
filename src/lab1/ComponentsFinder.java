@@ -52,7 +52,7 @@ public class ComponentsFinder {
             }
             valueStored = true;
         }
-        return 2;
+        return numberOfSets;
     }
 
     private void readFromFile() throws IOException {
