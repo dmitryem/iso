@@ -3,7 +3,6 @@ package lab3;
 import beans.Point;
 import beans.Vertex;
 import beans.WeightedStringEdge;
-import com.google.common.collect.TreeMultiset;
 
 import java.io.*;
 import java.util.*;
@@ -48,7 +47,7 @@ public class PathBetweenTriangles {
                 numbers[1] = Integer.parseInt(sNumbers[1]);
                 numbers[2] = Integer.parseInt(sNumbers[2]);
                 for (int i = 0; i < 3; i++) {
-                    WeightedStringEdge edge = getEdgeAsString(numbers[i], numbers[(i + 1) % 3], points);
+                    WeightedStringEdge edge = WeightedStringEdge.getEdgeAsString(numbers[i], numbers[(i + 1) % 3], points);
                     processEdge(vertex, edge, neighbors);
                 }
                 vertex.setNumber(vertices.size());
@@ -76,25 +75,9 @@ public class PathBetweenTriangles {
         br.close();
     }
 
-    private double distance(Point p1, Point p2) {
-        double dx = Math.pow(p1.getX() - p2.getX(), 2);
-        double dy = Math.pow(p1.getY() - p2.getY(), 2);
-        double dz = Math.pow(p1.getZ() - p2.getZ(), 2);
-        return Math.sqrt(dx + dy + dz);
-    }
 
-    private WeightedStringEdge getEdgeAsString(int a, int b, List<Point> points) {
-        WeightedStringEdge edge = new WeightedStringEdge();
-        if (a < b) {
-            edge.setEdge(a + "/" + b);
-        } else {
-            edge.setEdge(b + "/" + a);
-        }
-        Point p1 = points.get(a);
-        Point p2 = points.get(b);
-        edge.setWeight(distance(p1, p2));
-        return edge;
-    }
+
+
 
     private void processEdge(Vertex vertex, WeightedStringEdge edge, Map<WeightedStringEdge, Integer> neighbors) {
         Integer number = neighbors.get(edge);
@@ -162,7 +145,7 @@ public class PathBetweenTriangles {
         wrLeafs.write("# vtk DataFile Version 1.0\n...\nASCII\n\nDATASET POLYDATA\n");
 
         boolean canStartPoints = false;
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("1023082.brs")));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
         String strLine;
         while ((strLine = br.readLine()) != null) {
             if (strLine.contains("vertices")) {

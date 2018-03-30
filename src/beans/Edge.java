@@ -9,6 +9,18 @@ public class Edge{
     private int firstPoint;
     private int secondPoint;
     private double weight;
+    private double flow;
+
+    public Edge(int t,int s,double w){
+        setFirstPoint(s);
+        setSecondPoint(t);
+        setWeight(w);
+    }
+
+    public Edge() {
+
+    }
+
 
     public int getFirstPoint() {
         return firstPoint;
@@ -34,6 +46,14 @@ public class Edge{
         this.weight = weight;
     }
 
+
+    public void setFlow(double flow) {
+        this.flow = flow;
+    }
+
+    public double getFlow() {
+        return flow;
+    }
 
     @Override
     public boolean equals(Object obj) {
