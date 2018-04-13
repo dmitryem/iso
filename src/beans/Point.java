@@ -12,10 +12,19 @@ public class Point implements Comparable<Point> {
     private double z;
     private Set<Point> set;
 
-    public Point(){
+    public Point() {
         set = new HashSet<>();
         set.add(this);
     }
+
+    public Point(int x, int y) {
+        setX(x);
+        setY(y);
+        setZ(0);
+        set = new HashSet<>();
+        set.add(this);
+    }
+
 
     public double getX() {
         return x;
@@ -43,10 +52,10 @@ public class Point implements Comparable<Point> {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof  Point){
+        if (obj instanceof Point) {
             Point pointObj = (Point) obj;
             return pointObj.getX() == x && pointObj.getY() == y && pointObj.getZ() == z;
-        }else {
+        } else {
             return false;
         }
 
@@ -57,8 +66,8 @@ public class Point implements Comparable<Point> {
         return vectorLength().compareTo(o.vectorLength());
     }
 
-    private Double vectorLength(){
-        return Math.sqrt(x*x + y*y + z*z);
+    private Double vectorLength() {
+        return Math.sqrt(x * x + y * y + z * z);
     }
 
     public void setSet(Set<Point> set) {
@@ -69,8 +78,17 @@ public class Point implements Comparable<Point> {
         return set;
     }
 
-    public void addToSet(Point p){
+    public void addToSet(Point p) {
         set.add(p);
     }
 
+    @Override
+    public String toString() {
+        return x + " " + y + " " + z;
+    }
+
+    public void clear(){
+        set = new HashSet<>();
+        set.add(this);
+    }
 }

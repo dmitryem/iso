@@ -1,22 +1,34 @@
-import lab4.MaxFlow;
+import beans.Point;
+import lab5.Shteiner;
 
 import java.io.IOException;
-
 
 public class Main {
 
 
     public static void main(String[] args) {
-
         try {
-            //BRSToVTK.writeBRSToVTK("1023082.brs","initial.vtk");
+
+            Shteiner shteiner = new Shteiner(13, 6);
+            shteiner.initializePoints(initialPoints -> {
+                initialPoints.add(new Point(0, 0));
+                initialPoints.add(new Point(0, 3));
+                initialPoints.add(new Point(0, 6));
+                initialPoints.add(new Point(4, 3));
+                initialPoints.add(new Point(4, 0));
+                initialPoints.add(new Point(4, 6));
+                initialPoints.add(new Point(7, 2));
+                initialPoints.add(new Point(8, 0));
+                initialPoints.add(new Point(9, 2));
+                initialPoints.add(new Point(10, 6));
+                initialPoints.add(new Point(11, 2));
+                initialPoints.add(new Point(12, 0));
+                initialPoints.add(new Point(13, 2));
+            });
+            shteiner.setAddedPoints(3);
             long time = System.currentTimeMillis();
-            System.out.println("time: " + (System.currentTimeMillis() - time));
-            MaxFlow maxFlow = new MaxFlow("1023082.brs");
-            time = System.currentTimeMillis();
-            //maxFlow.writeToFile("flow.vtk",46686,129047);
-            maxFlow.writeToFile("flow.vtk",46685,46686);
-            System.out.println("time: " +(System.currentTimeMillis() - time));
+            shteiner.writeShteinerToFile("shteiner.vtk");
+            System.out.println(System.currentTimeMillis() - time);
         } catch (IOException e) {
             e.printStackTrace();
         }
