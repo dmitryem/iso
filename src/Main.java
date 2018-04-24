@@ -14,7 +14,7 @@ public class Main {
                 initialPoints.add(new Point(0, 0));
                 initialPoints.add(new Point(0, 3));
                 initialPoints.add(new Point(0, 6));
-                initialPoints.add(new Point(4, 3));
+                initialPoints.add(new Point(3, 3));
                 initialPoints.add(new Point(4, 0));
                 initialPoints.add(new Point(4, 6));
                 initialPoints.add(new Point(7, 2));

@@ -20,6 +20,8 @@ public class Shteiner {
     private List<Edge> edges;
     private List<Point> initialPoints = new ArrayList<>();
     private List<Edge> initialEdges = new ArrayList<>();
+    private Set<String> repeats = new HashSet<>();
+
 
     private int addedPoints = 0;
 
@@ -82,7 +84,17 @@ public class Shteiner {
                 walkThrough(level + 1, points);
             }
         } else {
-            workWithPoints(points);
+            //Need to exclude repeats in point mutual arrangement
+            Point[] copy = points.clone();
+            Arrays.sort(copy, Comparator.comparing(Point::toString));
+            StringBuilder s = new StringBuilder();
+            for (Point point : copy) {
+                s.append(point.toString()).append("/");
+            }
+            if(!repeats.contains(s.toString())) {
+                repeats.add(s.toString());
+                workWithPoints(points);
+            }
         }
     }
 
@@ -90,7 +102,7 @@ public class Shteiner {
         int initialSize = initialPoints.size();
         initialPoints.addAll(Arrays.asList(points));
         for (int i = 0; i < initialPoints.size(); i++) {
-            for(int j = 0;j < addedPoints;j++){
+            for (int j = 0; j < addedPoints; j++) {
                 initialPoints.get(i).clear();
                 if (initialSize + j != i) {
                     initialEdges.add(new Edge(i, initialSize + j, Edge.distance(initialPoints.get(i), points[j])));
@@ -155,6 +167,15 @@ public class Shteiner {
         wr.write("\nLINES " + edges.size() + " " + edges.size() * 3 + "\n");
         for (Edge e : edges) {
             wr.write("2 " + e.getFirstPoint() + " " + e.getSecondPoint() + "\n");
+        }
+        wr.write("POINT_DATA " + points.size() +
+                "\nSCALARS temp int\n" +
+                "LOOKUP_TABLE default\n");
+        for (int i = 0;i < points.size() - addedPoints;i++){
+            wr.write("0\n");
+        }
+        for(int i = 0;i < addedPoints;i++){
+            wr.write("50000\n");
         }
         wr.flush();
         wr.close();
