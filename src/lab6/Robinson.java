@@ -7,38 +7,41 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by demelyanov on 25.04.2018.
  */
 public class Robinson {
-
+    
     private final String filename;
-
+    
     private int n = -1;
     private int m = -1;
     private int iterations = 12;
-
-    List<List<Integer>> strategiesFirst = new ArrayList<>();
-    List<List<Integer>> strategiesSecond = new ArrayList<>();
-
+    
+    private List<List<Integer>> strategiesFirst = new ArrayList<>();
+    private List<List<Integer>> strategiesSecond = new ArrayList<>();
+    
     private int[] accumulateFirst;
     private int[] accumulateSecond;
-
-    int[] accumulateChooseFirst;
-    int[] accumulateChooseSecond;
-
+    
+    private int[] accumulateChooseFirst;
+    private int[] accumulateChooseSecond;
+    
     public Robinson(String filename){
         this.filename = filename;
     }
-
-
+    
+    
     public void readFromFile() throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
         String str = br.readLine();
         String[] sizes =str.split(" ");
         n = Integer.parseInt(sizes[0]);
         m = Integer.parseInt(sizes[1]);
+        System.out.println(n + " " + m);
         accumulateFirst =  new int[n];
         accumulateSecond =  new int[m];
         accumulateChooseFirst = new int[n];
@@ -58,66 +61,88 @@ public class Robinson {
         }
         br.close();
     }
-
-
-
+    
+    
+    
     private StringBuilder detalized = new StringBuilder();
-
+    
     public StringBuilder getDetalized() {
         return detalized;
     }
-
+    
     public void fictiveGame(){
         int count = 0;
-        int firstChoose = 0;//new Random().nextInt(n);
+        int firstChoose = 0;// new Random().nextInt(n);
         int secondChoose = 0;//new Random().nextInt(m);
         while(count != iterations) {
             accumulateChooseFirst[firstChoose]++;
             accumulateChooseSecond[secondChoose]++;
             for (int i = 0; i < n; i++) {
-                accumulateFirst[i] += strategiesSecond.get(firstChoose).get(i);
+                accumulateFirst[i] += strategiesSecond.get(secondChoose).get(i);
             }
             for (int i = 0; i < m; i++) {
-                accumulateSecond[i] += strategiesFirst.get(secondChoose).get(i);
+                accumulateSecond[i] += strategiesFirst.get(firstChoose).get(i);
             }
-            detalized.append(count).append(" ").append(firstChoose).append(" ").append(secondChoose).append(" ")
-                    .append(Arrays.toString(accumulateFirst)).append(" ").append(Arrays.toString(accumulateSecond)).append(" ").append("\n");
+            detalized.append("#").append(++count).append("\t1. ").append(firstChoose).append("\t2. ").append(secondChoose).append("\t")
+            .append(Arrays.toString(accumulateFirst)).append("\t").append(Arrays.toString(accumulateSecond)).append("\n");
+            
             int maxFirst = Integer.MIN_VALUE;
-            for(int i = 0;i < n;i++) {
-                if(accumulateFirst[i] > maxFirst){
-                    maxFirst = accumulateFirst[i];
-                    firstChoose = i;
+            int[] indexesFirst = getShuffledArray(n);
+            for (int anIndexesFirst : indexesFirst) {
+                if (accumulateFirst[anIndexesFirst] > maxFirst) {
+                    maxFirst = accumulateFirst[anIndexesFirst];
+                    firstChoose = anIndexesFirst;
                 }
             }
-            maxFirst = Integer.MAX_VALUE;
-            for(int i = 0;i < m;i++) {
-                if(accumulateSecond[i] < maxFirst){
-                    maxFirst = accumulateSecond[i];
-                    secondChoose = i;
+            
+            int minFirst = Integer.MAX_VALUE;
+            int[] indexesSecond = getShuffledArray(m);
+            for (int anIndexesSecond : indexesSecond) {
+                if (accumulateSecond[anIndexesSecond] < minFirst) {
+                    minFirst = accumulateSecond[anIndexesSecond];
+                    secondChoose = anIndexesSecond;
                 }
             }
-            count++;
         }
     }
-
-
-
+    
+    
+    
+    private int[] getShuffledArray(int n)
+    {
+        int[] ar = new int[n];
+        for(int i = 0; i < n; i++){
+            ar[i] = i;
+        }
+        
+        Random rnd = ThreadLocalRandom.current();
+        for (int i = ar.length - 1; i > 0; i--)
+        {
+            int index = rnd.nextInt(i + 1);
+            int a = ar[index];
+            ar[index] = ar[i];
+            ar[i] = a;
+        }
+        
+        return ar;
+    }
+    
     public int getIterations() {
         return iterations;
     }
-
+    
     public void setIterations(int iterations) {
         this.iterations = iterations;
     }
-
+    
     public int[] getAccumulateFirst() {
         return accumulateFirst;
     }
-
+    
     public int[] getAccumulateSecond() {
         return accumulateSecond;
     }
-
+    
     public double[] getAccumulateChooseFirst() {
         double[] array = new double[n];
         for(int i = 0;i < n;i++){
@@ -125,7 +150,7 @@ public class Robinson {
         }
         return array;
     }
-
+    
     public double[] getAccumulateChooseSecond() {
         double[] array = new double[m];
         for(int i = 0;i < m;i++){
@@ -134,3 +159,4 @@ public class Robinson {
         return array;
     }
 }
+
