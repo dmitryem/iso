@@ -1,9 +1,11 @@
+package lab5;
+
 import beans.Point;
 import lab5.Shteiner;
 
 import java.io.IOException;
 
-public class Main5 {
+public class Main {
 
 
     public static void main(String[] args) {

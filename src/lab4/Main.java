@@ -1,9 +1,11 @@
+package lab4;
+
 import lab4.MaxFlow;
 
 import java.io.IOException;
 
 
-public class Main4 {
+public class Main {
 
 
     public static void main(String[] args) {

@@ -41,7 +41,6 @@ public class Robinson {
         String[] sizes =str.split(" ");
         n = Integer.parseInt(sizes[0]);
         m = Integer.parseInt(sizes[1]);
-        System.out.println(n + " " + m);
         accumulateFirst =  new int[n];
         accumulateSecond =  new int[m];
         accumulateChooseFirst = new int[n];

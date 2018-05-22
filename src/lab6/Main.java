@@ -1,3 +1,5 @@
+package lab6;
+
 import lab6.Robinson;
 
 import java.io.IOException;
@@ -7,14 +9,23 @@ public class Main {
 
 
     public static void main(String[] args) {
-        try{
+        playGame("matrix.mtr");
+        playGame("m2.mtr");
+        playGame("m3.mtr");
+        playGame("m4.mtr");
 
-            Robinson robinson = new Robinson("matrix.mtr");
+    }
+
+
+    private static void playGame(String filename){
+        try{
+            Robinson robinson = new Robinson(filename);
             robinson.readFromFile();
-            robinson.setIterations(10000);
+            robinson.setIterations(1000);
             robinson.fictiveGame();
             System.out.println(Arrays.toString(robinson.getAccumulateChooseFirst()));
             System.out.println(Arrays.toString(robinson.getAccumulateChooseSecond()));
+            System.out.println("------------------------------------------------");
         }catch (IOException e){
             System.out.println(1);
         }

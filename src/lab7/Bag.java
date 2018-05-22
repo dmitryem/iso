@@ -26,12 +26,12 @@ public class Bag {
         countOfItems = Integer.parseInt(str);
         str = br.readLine();
         String[] costsS = str.split(" ");
-        for (String s : costsS){
+        for (String s : costsS) {
             costs.add(Integer.parseInt(s));
         }
         str = br.readLine();
         String[] weighsS = str.split(" ");
-        for (String s : weighsS){
+        for (String s : weighsS) {
             weighs.add(Integer.parseInt(s));
         }
         str = br.readLine();
@@ -41,10 +41,10 @@ public class Bag {
 
     public void run() {
         int[][] cells = new int[countOfItems][capacity];
-        ArrayList[][] cellsOfItems = new ArrayList[countOfItems][capacity];
+        List<Integer>[][] cellsOfItems = new ArrayList[countOfItems][capacity];
         for (int i = 0; i < countOfItems; i++) {
             for (int j = 0; j < capacity; j++) {
-                cellsOfItems[i][j] = new ArrayList<Integer>();
+                cellsOfItems[i][j] = new ArrayList<>();
             }
         }
 
@@ -52,7 +52,7 @@ public class Bag {
             for (int j = 0; j < capacity; j++) {
                 if (i == 0) {
                     if (weighs.get(i) <= j + 1) {
-                        cells[i][j] =costs.get(i);
+                        cells[i][j] = costs.get(i);
                         cellsOfItems[i][j].add(i);
                     } else {
                         cells[i][j] = 0;
@@ -65,22 +65,21 @@ public class Bag {
                             cells[i][j] += cells[i - 1][j - weighs.get(i)];
                             cellsOfItems[i][j].addAll(cellsOfItems[i - 1][j - weighs.get(i)]);
                         }
-                        if (cells[i - 1][j] >cells[i][j])
-                        {
+                        if (cells[i - 1][j] > cells[i][j]) {
 
-                            cells[i][j] =cells[i - 1][j];
-                            cellsOfItems[i][j] =cellsOfItems[i - 1][j];
+                            cells[i][j] = cells[i - 1][j];
+                            cellsOfItems[i][j] = cellsOfItems[i - 1][j];
                         }
                     } else {
-                        cells[i][j] =cells[i - 1][j];
-                        cellsOfItems[i][j] =cellsOfItems[i - 1][j];
+                        cells[i][j] = cells[i - 1][j];
+                        cellsOfItems[i][j] = cellsOfItems[i - 1][j];
                     }
                 }
             }
         }
         for (int i = 0; i < countOfItems; i++) {
             for (int j = 0; j < capacity; j++) {
-                System.out.print(cells[i][j] +" " );
+                System.out.print(cells[i][j] + " ");
             }
             System.out.println();
         }

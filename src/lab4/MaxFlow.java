@@ -101,7 +101,7 @@ public class MaxFlow {
 
     private void addEdge(int s, int t, double cap) {
         graph.get(s).add(new Edge(t, graph.get(t).size(), cap));
-        graph.get(t).add(new Edge(s, graph.get(s).size() - 1, 0));
+        graph.get(t).add(new Edge(s, graph.get(s).size() - 1, cap));
     }
 
     private boolean dinicBfs(int src, int dest, int[] dist) {
